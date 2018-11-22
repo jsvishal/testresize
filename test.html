@@ -123,6 +123,18 @@ h1,h2,h3,h4,h5,h6 {
 cursor: nwse-resize;
 
 }
+.vvBtn{
+  position: fixed;
+  background: blue;
+  color: white;
+  right:0;
+  bottom: 0;
+}
+.vvBtn.vvBox{
+  right:70px;
+  bottom: 0;
+}
+
 </style>
 <script
   src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -135,7 +147,7 @@ cursor: nwse-resize;
 <script type="text/javascript" src="./test_files/selector.js"></script>
 <script>
   var items = [];
-  var vobj = {};
+  var vobj = {},editMode;
  function getAllChangedDom(){
        
         for(var i = 0; i < items.length; i++){
@@ -153,27 +165,47 @@ cursor: nwse-resize;
  });
  
   $( document ).ready(function() {
-    console.log( "ready!" );
+     $("body").append("<button mode='resize' class='vvBtn vvResize'>Resize</button><button class='vvBtn vvBox' mode='box' >Box</button>");
+
+    $(".vvBtn").click(function(){
+      editMode = $(this).attr("mode");
+      alert("Mode Selected - "+editMode );
+      if(editMode == "box"){
+        $(".resizable").resizable('destroy')
+      }
+    })
+
+
+
     $(document).mouseover(function(e){
-      var elm = $(e.target);
-      elm.addClass("red-vv");
+       if(editMode == "resize"){
+           var elm = $(e.target);
+           elm.addClass("red-vv");
+       }
+     
     }).mouseout(function(e){
-      var elm = $(e.target);
-      elm.removeClass("red-vv");
+      if(editMode == "resize"){
+        var elm = $(e.target);
+        elm.removeClass("red-vv");
+      }
+      
     })
 
     $(document).mouseup(function(e){
-      $(".elementClicked-vv").removeClass("elementClicked-vv");
-      var elm = $(e.target);
-      var path = my_selector_generator.getSelector(e.target);
-      if(path == "html"){
-        return;
+      if(editMode == "resize"){
+          $(".elementClicked-vv").removeClass("elementClicked-vv");
+          var elm = $(e.target);
+          var path = my_selector_generator.getSelector(e.target);
+          if(path == "html"){
+            return;
+          }
+          items.push(path);
+          //elm.append(dom)
+          elm.addClass("elementClicked-vv").resizable({
+          
+        });
       }
-      items.push(path);
-      //elm.append(dom)
-      elm.addClass("elementClicked-vv").resizable({
       
-    });
     })
 
     

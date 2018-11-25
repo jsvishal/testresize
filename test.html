@@ -120,7 +120,7 @@ h1,h2,h3,h4,h5,h6 {
 
 .elementClicked-vv{
   outline:2px dotted black !important;
-cursor: nwse-resize;
+
 
 }
 .vvBtn{
@@ -130,9 +130,19 @@ cursor: nwse-resize;
   right:0;
   bottom: 0;
 }
-.vvBtn.vvBox{
+.vvBtn.delete{
   right:70px;
   bottom: 0;
+}
+.vvBtn.save{
+  right:150px;
+  bottom: 0;
+}
+.vv-draggable{
+  display: inline-block;
+  width:200px;
+  height: 200px;
+  background: red;
 }
 
 </style>
@@ -140,14 +150,16 @@ cursor: nwse-resize;
   src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
   integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
   crossorigin="anonymous"></script>
-<script
-  src="https://rawgit.com/RickStrahl/jquery-resizable/master/src/jquery-resizable.js"
-  crossorigin="anonymous"></script>
+
+  <script src="https://unpkg.com/interactjs@1.3/dist/interact.min.js"></script>
 
 <script type="text/javascript" src="./test_files/selector.js"></script>
+<script type="text/javascript" src="./test.js"></script>
 <script>
   var items = [];
   var vobj = {},editMode;
+  var draggBox  = $("<div></div>").addClass("vv-draggable newBox addedForDrag");
+
  function getAllChangedDom(){
        
         for(var i = 0; i < items.length; i++){
@@ -161,17 +173,49 @@ cursor: nwse-resize;
         console.log(JSON.stringify(vobj));
  }
  var my_selector_generator = new CssSelectorGenerator({
-   'class_blacklist':['red-vv','elementClicked-vv','resizable']
+   'class_blacklist':['red-vv','elementClicked-vv','resizable','newBox','addedForDrag','vvResize']
  });
+ var objSave = {};
  
   $( document ).ready(function() {
-     $("body").append("<button mode='resize' class='vvBtn vvResize'>Resize</button><button class='vvBtn vvBox' mode='box' >Box</button>");
+     $("body").append("<button mode='resize' class='vvBtn vvResize'>Resize</button><button class='vvBtn delete' mode='delete' >delete</button><button class='vvBtn save' mode='save' >save</button>");
 
     $(".vvBtn").click(function(){
       editMode = $(this).attr("mode");
-      alert("Mode Selected - "+editMode );
-      if(editMode == "box"){
-        $(".resizable").resizable('destroy')
+      //alert("Mode Selected - "+editMode );
+      if(editMode == "delete"){
+        $(".elementClicked-vv").remove()
+      }
+
+      if(editMode == "save"){
+        $(".newBox").each(function(){
+         if($(this).hasClass("addedForDrag")){
+             var perent = $(this).parent();
+            var path = my_selector_generator.getSelector(perent.get(0));
+            objSave[path] = objSave[path] || [];
+            objSave[path].push({
+              left:$(this).data("x"),
+              top:$(this).data("y"),
+              height:$(this).height(),
+              width:$(this).width(),
+              isAdded:true
+            })
+          }else if($(this).data('resized')){
+             var elm = $(this);
+             var path = my_selector_generator.getSelector(elm.get(0));
+             objSave[path] = objSave[path] || [];
+             objSave[path].push({
+              left:$(this).data("x"),
+              top:$(this).data("y"),
+              height:$(this).height(),
+              width:$(this).width(),
+              isAdded:false
+            })
+          }
+          
+
+        })
+         console.log(JSON.stringify(objSave));
       }
     })
 
@@ -191,20 +235,25 @@ cursor: nwse-resize;
       
     })
 
-    $(document).mouseup(function(e){
-      if(editMode == "resize"){
+    $(document).dblclick(function(e){
+         if(!$(e.target).hasClass("vvBtn")){
+           var elm = $(e.target).append(draggBox.clone());
+           dragMe(".vv-draggable");
+          }
+    })
+
+    $(document).click(function(e){
+     
           $(".elementClicked-vv").removeClass("elementClicked-vv");
           var elm = $(e.target);
           var path = my_selector_generator.getSelector(e.target);
           if(path == "html"){
             return;
           }
-          items.push(path);
+          //items.push(path);
           //elm.append(dom)
-          elm.addClass("elementClicked-vv").resizable({
-          
-        });
-      }
+          elm.addClass("elementClicked-vv newBox");
+          dragMe(".elementClicked-vv");
       
     })
 

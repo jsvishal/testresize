@@ -135,17 +135,36 @@ cursor: nwse-resize;
 <script type="text/javascript" src="./test_files/selector.js"></script>
 <script>
   var items = [];
-  var obj = '{"#contact":{"height":709,"width":436},"#menu":{"height":776.969,"width":1100},"#about > :nth-child(2)":{"height":519,"width":394},".w3-col.w3-hide-small > .w3-round":{"height":604,"width":234}}';
+  var obj = '{".w3-col.w3-hide-small > .w3-round":[{"left":0,"top":0,"height":627.469,"width":165.984,"isAdded":false}],".w3-col.w3-hide-small":[{"left":10,"top":-91,"height":200,"width":200,"isAdded":true},{"left":249,"top":-493,"height":200,"width":152,"isAdded":true}]}';
 
   var objS = JSON.parse(obj);
 
  
   $( document ).ready(function() {
-    
+    var box = $("<div style='background: red;display:inline-block'/>");
+   // var clone = box.clone();
     for(var selector in objS){
        if(objS.hasOwnProperty(selector)){
-          $(selector).width(objS[selector].width);
-          $(selector).height(objS[selector].height);
+         
+          for(var i=0;i<objS[selector].length;i++){
+            var style = objS[selector][i];
+            var stylesObj = {};
+            if(style.left != undefined && style.isAdded){
+              stylesObj["-webkit-transform"] = "translate("+style.left+"px,"+style.top+"px)"; 
+              stylesObj["-ms-transform"] = "translate("+style.left+"px,"+style.top+"px)"; 
+              stylesObj["transform"] = "translate("+style.left+"px,"+style.top+"px)"; 
+            }
+            stylesObj["width"] = style.width;
+            stylesObj["height"] = style.height;
+            
+            if(style.isAdded){
+              $(selector).append(box.clone().css(stylesObj));
+            }else{
+              $(selector).css(stylesObj);
+            }
+            
+          }
+          
             
        }
     }  

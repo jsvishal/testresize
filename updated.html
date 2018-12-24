@@ -135,7 +135,7 @@ cursor: nwse-resize;
 <script type="text/javascript" src="./test_files/selector.js"></script>
 <script>
   var items = [];
-  var obj = '{"#home > .w3-image":[{"left":0,"top":0,"height":709,"width":814,"isAdded":false}],"#home":[{"left":37,"top":-89,"height":200,"width":401,"isAdded":true}]}';
+  var obj = '{".w3-col.w3-hide-small > .w3-round":[{"left":0,"top":0,"height":627.469,"width":320.984,"isAdded":false}],".w3-col.w3-hide-small":[{"left":325.984375,"top":-626,"height":200,"width":200,"isAdded":true,"Image_Link":"https://assetscdn1.paytm.com/images/catalog/product/C/CO/COMBLUETOOTH-SPWHIT92725353EB595F/a_8.jpg?imwidth=320&impolicy=hq","Redirect_Link":""},{"left":120.984375,"top":-378,"height":200,"width":200,"isAdded":true,"Image_Link":"https://assetscdn1.paytm.com/images/catalog/product/C/CO/COMBOAT-STONE-1BAYA294541CCA63E/a_5.jpg?imwidth=282&impolicy=hq","Redirect_Link":""}]}';
 
   var objS = JSON.parse(obj);
 
@@ -156,12 +156,15 @@ cursor: nwse-resize;
             }
             stylesObj["width"] = style.width;
             stylesObj["height"] = style.height;
-            
+            if(style["Image_Link"]){
+               stylesObj['background-image'] =  'url(' + style["Image_Link"] + ')';
+            }
             if(style.isAdded){
               $(selector).append(box.clone().css(stylesObj));
             }else{
               $(selector).css(stylesObj);
             }
+
             
           }
           

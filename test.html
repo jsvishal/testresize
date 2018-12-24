@@ -113,6 +113,13 @@ h1,h2,h3,h4,h5,h6 {
         <button class="g-new-template">New Template</button>
     </div>
 </div>
+
+<div id="mainPopup" class="hide">
+  Image Link: <input type="text" id="Image_Link"/>
+  <br/>
+  Redirect Link <input type="text" id="Redirect_Link"/>
+  <br/> <input type="button" id="vv-submit">
+</div>
 <style>
 .red-vv{
   border:1px solid red !important;
@@ -122,6 +129,9 @@ h1,h2,h3,h4,h5,h6 {
   outline:2px dotted black !important;
 
 
+}
+.hide{
+  display: none;
 }
 .vvBtn{
   position: fixed;
@@ -144,6 +154,19 @@ h1,h2,h3,h4,h5,h6 {
   height: 200px;
   background: red;
 }
+.vv-draggable .vv-addContent{
+  margin: 0 auto;
+  vertical-align: middle;
+}
+#mainPopup{
+  position: fixed;
+  height: 100vh;
+  width: 300px;
+  top:200px;
+  left:200px;
+  background: gray;
+
+}
 
 </style>
 <script
@@ -156,9 +179,11 @@ h1,h2,h3,h4,h5,h6 {
 <script type="text/javascript" src="./test_files/selector.js"></script>
 <script type="text/javascript" src="./test.js"></script>
 <script>
+  var lastOpened ;
+  var $parent = $;
   var items = [];
   var vobj = {},editMode;
-  var draggBox  = $("<div></div>").addClass("vv-draggable newBox addedForDrag");
+  var draggBox  = $parent("<div class='vv-contentHolder'><button class='addBtn'>Add Content</button></div>").addClass("vv-draggable newBox addedForDrag");
 
  function getAllChangedDom(){
        
@@ -180,36 +205,54 @@ h1,h2,h3,h4,h5,h6 {
   $( document ).ready(function() {
      $("body").append("<button mode='resize' class='vvBtn vvResize'>Resize</button><button class='vvBtn delete' mode='delete' >delete</button><button class='vvBtn save' mode='save' >save</button>");
 
+    $(document).on("click",".addBtn",function(){
+       debugger;
+       lastOpened = $(this);
+       $("#mainPopup").removeClass("hide");
+    })
+     $("#vv-submit").click(function(){
+        var lastOpenedParent = lastOpened.closest(".vv-contentHolder");
+        lastOpenedParent.attr("vv-image",$("#Image_Link").val())
+        lastOpenedParent.attr("vv-link",$("#Redirect_Link").val())
+        var imageUrl = $("#Image_Link").val();
+        lastOpenedParent.css('background-image', 'url(' + imageUrl + ')')
+         $("#mainPopup").addClass("hide");
+    })
+
     $(".vvBtn").click(function(){
       editMode = $(this).attr("mode");
       //alert("Mode Selected - "+editMode );
       if(editMode == "delete"){
-        $(".elementClicked-vv").remove()
+        $parent(".elementClicked-vv").remove()
       }
 
       if(editMode == "save"){
-        $(".newBox").each(function(){
-         if($(this).hasClass("addedForDrag")){
-             var perent = $(this).parent();
+        $parent(".newBox").each(function(){
+         if($parent(this).hasClass("addedForDrag")){
+             var perent = $parent(this).parent();
             var path = my_selector_generator.getSelector(perent.get(0));
             objSave[path] = objSave[path] || [];
             objSave[path].push({
-              left:$(this).data("x"),
-              top:$(this).data("y"),
-              height:$(this).height(),
-              width:$(this).width(),
-              isAdded:true
+              left:$parent(this).data("x"),
+              top:$parent(this).data("y"),
+              height:$parent(this).height(),
+              width:$parent(this).width(),
+              isAdded:true,
+              Image_Link: $parent(this).attr("vv-image"),
+              Redirect_Link: $parent(this).attr("vv-link")
             })
-          }else if($(this).data('resized')){
-             var elm = $(this);
+          }else if($parent(this).data('resized')){
+             var elm = $parent(this);
              var path = my_selector_generator.getSelector(elm.get(0));
              objSave[path] = objSave[path] || [];
              objSave[path].push({
-              left:$(this).data("x"),
-              top:$(this).data("y"),
-              height:$(this).height(),
-              width:$(this).width(),
-              isAdded:false
+              left:$parent(this).data("x"),
+              top:$parent(this).data("y"),
+              height:$parent(this).height(),
+              width:$parent(this).width(),
+              isAdded:false,
+              Image_Link:$parent(this).attr("vv-image"),
+              Redirect_Link:$parent(this).attr("vv-link")
             })
           }
           
@@ -219,31 +262,36 @@ h1,h2,h3,h4,h5,h6 {
       }
     })
 
+   
+
+    
 
 
-    $(document).mouseover(function(e){
+
+    $parent("body").mouseover(function(e){
        if(editMode == "resize"){
-           var elm = $(e.target);
+           var elm = $parent(e.target);
            elm.addClass("red-vv");
        }
      
     }).mouseout(function(e){
       if(editMode == "resize"){
-        var elm = $(e.target);
+        var elm = $parent(e.target);
         elm.removeClass("red-vv");
       }
       
     })
 
-    $(document).dblclick(function(e){
-         if(!$(e.target).hasClass("vvBtn")){
-           var elm = $(e.target).append(draggBox.clone());
+    $parent(document).dblclick(function(e){
+         if(!$parent(e.target).hasClass("vvBtn")){
+           var elm = $parent(e.target).append(draggBox.clone());
            dragMe(".vv-draggable");
           }
     })
 
-    $(document).click(function(e){
-     
+    $parent(document).click(function(e){
+
+      
           $(".elementClicked-vv").removeClass("elementClicked-vv");
           var elm = $(e.target);
           var path = my_selector_generator.getSelector(e.target);
@@ -257,8 +305,5 @@ h1,h2,h3,h4,h5,h6 {
       
     })
 
-    
-});
+    });
 </script> 
-
-</body></html>

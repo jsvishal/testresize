@@ -1,0 +1,16 @@
+.vv-draggable{
+  display: inline-block;
+  width:200px;
+  height: 200px;
+  background: red;
+}
+.vv-draggable .vv-addContent{
+  margin: 0 auto;
+  vertical-align: middle;
+}
+.elementClicked-vv{
+  outline:2px dotted black !important;
+}
+.red-vv{
+  border:1px solid red !important;
+}
